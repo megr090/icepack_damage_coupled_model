@@ -178,21 +178,21 @@ def calcStress(**kwargs):
     sigma_zz = ice_density * gravity * (s - zp)
     p_i = sigma_zz - t11 - t22
 
-    #if p_type == "effective":
-    #    # Calculate water pressure
-    #    zdiff = interpolate(conditional(zp<zsl,1,0),Q3) # find regions where height does not exceed the water line
-    #    p_w = firedrakeSmooth(interpolate((water_density*gravity*(zsl-zp))*zdiff,Q3),α=2e3)
-    #    p_w = interpolate((water_density*gravity*(zsl-zp))*zdiff,Q3)
-    #    
-    #    # Calculate effective pressure
-    #    peff = interpolate(p_i - p_w,Q3)
-    #
-    #    p = peff
-    #else:
-    #    p = p_i 
+    if p_type == "effective":
+        # Calculate water pressure
+        zdiff = interpolate(conditional(zp<zsl,1,0),Q3) # find regions where height does not exceed the water line
+        p_w = firedrakeSmooth(interpolate((water_density*gravity*(zsl-zp))*zdiff,Q3),α=2e3)
+        p_w = interpolate((water_density*gravity*(zsl-zp))*zdiff,Q3)
+        
+        # Calculate effective pressure
+        peff = interpolate(p_i - p_w,Q3)
+    
+        p = peff
+    else:
+        p = p_i 
 
     # calculate Cauchy stress
-    s11, s22, s33, s12 = t11 - p_i, t22 - p_i, t33 - p_i, t12
+    s11, s22, s33, s12 = t11 - p, t22 - p, t33 - p, t12
 
     # calculate invariants
     I1 = s11 + s22 + s33  # effective I1 invariant
